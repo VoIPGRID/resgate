@@ -4,6 +4,7 @@ import (
 	"sync"
 
 	"github.com/resgateio/resgate/server/codec"
+	"github.com/resgateio/resgate/server/metrics"
 	"github.com/resgateio/resgate/server/mq"
 	"github.com/resgateio/resgate/server/reserr"
 )
@@ -114,6 +115,7 @@ func (e *EventSubscription) addSubscriber(sub Subscriber, t *Throttle) {
 			// Metrics
 			if e.cache.metrics != nil {
 				e.cache.metrics.CacheSubscriptions.Add(-1)
+				e.cache.metrics.SubcriptionsCount.With(metrics.SanitizedString(e.ResourceName)).Set(float64(e.count))
 			}
 
 			sub.Loaded(nil, rs.err)
@@ -218,6 +220,9 @@ func (e *EventSubscription) addCount() {
 		e.cache.unsubQueue.Remove(e)
 	}
 	e.count++
+	if e.cache.metrics != nil {
+		e.cache.metrics.SubcriptionsCount.With(metrics.SanitizedString(e.ResourceName)).Set(float64(e.count))
+	}
 }
 
 // removeCount decreases the subscription count, and puts the event subscription
@@ -231,6 +236,7 @@ func (e *EventSubscription) removeCount(n int64) {
 	// Metrics
 	if e.cache.metrics != nil {
 		e.cache.metrics.CacheSubscriptions.Add(float64(-n))
+		e.cache.metrics.SubcriptionsCount.With(metrics.SanitizedString(e.ResourceName)).Set(float64(e.count))
 	}
 }
 

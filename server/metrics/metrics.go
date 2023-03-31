@@ -1,9 +1,15 @@
 package metrics
 
 import (
+	"regexp"
 	"runtime"
 
 	"github.com/bsm/openmetrics"
+)
+
+var (
+	uUIDRegex = regexp.MustCompile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
+	iDRegex   = regexp.MustCompile("[0-9]+")
 )
 
 type MetricSet struct {
@@ -26,6 +32,8 @@ type MetricSet struct {
 	HTTPRequests     openmetrics.CounterFamily
 	HTTPRequestsGet  openmetrics.Counter
 	HTTPRequestsPost openmetrics.Counter
+	// Subscriptions
+	SubcriptionsCount openmetrics.GaugeFamily
 }
 
 // Scrape updates the metric set with info on current mem usage.
@@ -99,4 +107,17 @@ func (m *MetricSet) Register(reg *openmetrics.Registry, version string, protocol
 		Help: "Current number of subscriptions on cached resources.",
 	}).With()
 	m.CacheSubscriptions.Set(0)
+
+	// Subscriptions
+	m.SubcriptionsCount = reg.Gauge(openmetrics.Desc{
+		Name:   "resgate_cache_subscriptions",
+		Help:   "Number of subscriptions per sanitized name.",
+		Labels: []string{"name"},
+	})
+}
+
+func SanitizedString(s string) string {
+	s = uUIDRegex.ReplaceAllString(s, "{uuid}")
+	s = iDRegex.ReplaceAllString(s, "{id}")
+	return s
 }
