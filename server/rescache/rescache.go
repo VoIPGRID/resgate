@@ -269,6 +269,7 @@ func (c *Cache) getSubscription(name string, subscribe bool) (*EventSubscription
 			cache:        c,
 			count:        1,
 		}
+		metrics.SubcriptionsCount.WithLabelValues(metrics.SanitizedString(name)).Inc()
 
 		c.eventSubs[name] = eventSub
 
