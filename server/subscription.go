@@ -200,9 +200,11 @@ func (s *Subscription) Loaded(resourceSub *rescache.ResourceSubscription, respon
 		}
 
 		// We check if we received a traceparent header in the response. If we did, we set it on the subscription.
-		val, ok := responseHeaders["traceparent"]
-		if ok && len(val) > 0 && s.traceparent == "" {
-			s.traceparent = val[0]
+		if responseHeaders != nil {
+			val, ok := responseHeaders["traceparent"]
+			if ok && len(val) > 0 && s.traceparent == "" {
+				s.traceparent = val[0]
+			}
 		}
 
 		s.resourceSub = resourceSub
@@ -519,6 +521,7 @@ func (s *Subscription) addReference(rid string) (*Subscription, error) {
 
 	requestHeaders := make(map[string][]string)
 
+	// If the subscription has a traceparent, add it to the subsiquent requests as a request header.
 	if s.traceparent != "" {
 		requestHeaders["traceparent"] = []string{s.traceparent}
 	}
