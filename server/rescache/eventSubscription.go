@@ -114,8 +114,7 @@ func (e *EventSubscription) addSubscriber(sub Subscriber, t *Throttle, requestHe
 
 			// Metrics
 			if e.cache.metrics != nil {
-				e.cache.metrics.CacheSubscriptions.Add(-1)
-				e.cache.metrics.SubcriptionsCount.With(metrics.SanitizedString(e.ResourceName)).Set(float64(e.count))
+				e.cache.metrics.CacheSubscriptions.WithLabelValues(metrics.SanitizedString(e.ResourceName)).Set(float64(e.count))
 			}
 
 			sub.Loaded(nil, nil, rs.err)
@@ -221,7 +220,7 @@ func (e *EventSubscription) addCount() {
 	}
 	e.count++
 	if e.cache.metrics != nil {
-		e.cache.metrics.SubcriptionsCount.With(metrics.SanitizedString(e.ResourceName)).Set(float64(e.count))
+		e.cache.metrics.CacheSubscriptions.WithLabelValues(metrics.SanitizedString(e.ResourceName)).Set(float64(e.count))
 	}
 }
 
@@ -235,8 +234,7 @@ func (e *EventSubscription) removeCount(n int64) {
 
 	// Metrics
 	if e.cache.metrics != nil {
-		e.cache.metrics.CacheSubscriptions.Add(float64(-n))
-		e.cache.metrics.SubcriptionsCount.With(metrics.SanitizedString(e.ResourceName)).Set(float64(e.count))
+		e.cache.metrics.CacheSubscriptions.WithLabelValues(metrics.SanitizedString(e.ResourceName)).Set(float64(e.count))
 	}
 }
 

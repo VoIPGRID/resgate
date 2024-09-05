@@ -6,8 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/bsm/openmetrics"
-	"github.com/bsm/openmetrics/omhttp"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/resgateio/resgate/server/metrics"
 )
 
@@ -31,27 +30,14 @@ func (s *Service) startMetricsServer() {
 		return
 	}
 
-	reg := openmetrics.NewConsistentRegistry(func() time.Time { return time.Now() })
-	ms := s.metrics
-	ms.Register(reg, Version, ProtocolVersion)
-
-	h := omhttp.NewHandler(reg)
-	s.metricsh = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ms.Scrape()
-		h.ServeHTTP(w, r)
-	})
-
-	// For testing
-	if s.cfg.NoHTTP {
-		return
-	}
+	s.metrics.Register(Version, ProtocolVersion)
 
 	mux := http.NewServeMux()
-	mux.Handle(MetricsPattern, s.metricsh)
+	mux.Handle(MetricsPattern, promhttp.Handler())
 
 	hln, err := net.Listen("tcp", s.cfg.metricsNetAddr)
 	if err != nil {
-		s.Logf("Metrics server can't listen on %s: %s", s.cfg.metricsNetAddr, err)
+		s.Logf("Metrics server can't listin on %s", s.cfg.metricsNetAddr)
 		return
 	}
 
@@ -60,7 +46,7 @@ func (s *Service) startMetricsServer() {
 	}
 	s.m = metricsServer
 
-	s.Logf("Metrics endpoint listening on %s://%s%s", s.cfg.scheme, s.cfg.metricsNetAddr, MetricsPattern)
+	s.Logf("Metrics endpoint listening on %s://%s", s.cfg.scheme, s.cfg.metricsNetAddr)
 
 	go func() {
 		var err error
@@ -74,7 +60,6 @@ func (s *Service) startMetricsServer() {
 			s.Stop(err)
 		}
 	}()
-
 }
 
 // stopMetricsServer stops the Metrics server

@@ -82,7 +82,6 @@ func (s *Service) wsHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Metrics
 	if s.metrics != nil {
-		s.metrics.WSConnectionCount.Add(1)
 		s.metrics.WSConnections.Add(1)
 	}
 

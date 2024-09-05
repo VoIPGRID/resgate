@@ -91,7 +91,7 @@ func (s *Service) apiHandler(w http.ResponseWriter, r *http.Request) {
 	case "GET":
 		// Metrics
 		if s.metrics != nil {
-			s.metrics.HTTPRequestsGet.Add(1)
+			s.metrics.HTTPRequests.WithLabelValues("GET").Add(1)
 		}
 
 		rid = PathToRID(path, r.URL.RawQuery, apiPath)
@@ -114,7 +114,7 @@ func (s *Service) apiHandler(w http.ResponseWriter, r *http.Request) {
 	case "POST":
 		// Metrics
 		if s.metrics != nil {
-			s.metrics.HTTPRequestsPost.Add(1)
+			s.metrics.HTTPRequests.WithLabelValues("POST").Add(1)
 		}
 
 		rid, action = PathToRIDAction(path, r.URL.RawQuery, apiPath)
@@ -142,7 +142,7 @@ func (s *Service) apiHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Metrics
 		if s.metrics != nil {
-			s.metrics.HTTPRequests.With(r.Method).Add(1)
+			s.metrics.HTTPRequests.WithLabelValues(r.Method).Add(1)
 		}
 
 		rid = PathToRID(path, r.URL.RawQuery, apiPath)

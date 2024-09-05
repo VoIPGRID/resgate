@@ -275,8 +275,7 @@ func (c *Cache) getSubscription(name string, subscribe bool) (*EventSubscription
 		// Metrics
 		if c.metrics != nil {
 			c.metrics.CacheResources.Add(1)
-			c.metrics.CacheSubscriptions.Add(1)
-			c.metrics.SubcriptionsCount.With(metrics.SanitizedString(name)).Add(1)
+			c.metrics.CacheSubscriptions.WithLabelValues(metrics.SanitizedString(name)).Add(1)
 		}
 
 	} else {
@@ -284,7 +283,7 @@ func (c *Cache) getSubscription(name string, subscribe bool) (*EventSubscription
 
 		// Metrics
 		if c.metrics != nil {
-			c.metrics.CacheSubscriptions.Add(1)
+			c.metrics.CacheSubscriptions.WithLabelValues(metrics.SanitizedString(name)).Add(1)
 		}
 	}
 
