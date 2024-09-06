@@ -37,7 +37,7 @@ func (s *Service) startMetricsServer() {
 
 	hln, err := net.Listen("tcp", s.cfg.metricsNetAddr)
 	if err != nil {
-		s.Logf("Metrics server can't listin on %s", s.cfg.metricsNetAddr)
+		s.Logf("Metrics server can't listen on %s", s.cfg.metricsNetAddr)
 		return
 	}
 
