@@ -25,14 +25,6 @@ func subscribeToResource(t *testing.T, s *Session, c *Conn, rid string) string {
 	return subscribeToCustomResource(t, s, c, rid, rsrc)
 }
 
-func subscribeToCachedResource(t *testing.T, s *Session, c *Conn, rid string) string {
-	rsrc, ok := resources[rid]
-	if !ok {
-		panic("no resource named " + rid)
-	}
-	return subscribeToCustomResourceExt(t, s, c, rid, rsrc, true)
-}
-
 func subscribeToCustomResource(t *testing.T, s *Session, c *Conn, rid string, rsrc resource) string {
 	return subscribeToCustomResourceExt(t, s, c, rid, rsrc, false)
 }
