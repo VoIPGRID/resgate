@@ -530,7 +530,7 @@ func (s *Subscription) addReference(rid string) (*Subscription, error) {
 
 	requestHeaders := make(map[string][]string)
 
-	// If the subscription has a traceparent, add it to the subsiquent requests as a request header.
+	// If the subscription has a traceparent, add it to the subsequent requests as a request header.
 	if s.traceparent != "" {
 		requestHeaders["traceparent"] = []string{s.traceparent}
 	}
